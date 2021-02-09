@@ -35,12 +35,7 @@ Item {
 
     Component {
         id: keyButton
-        AngloKey {
-            MouseArea {
-                anchors.fill: parent
-                onClicked: parent.pressed = !parent.pressed
-            }
-        }
+        AngloKey {}
     }
 
     Component.onCompleted: {

@@ -48,4 +48,10 @@ Item {
             horizontalAlignment: Text.AlignHCenter
         }
     }
+
+    MouseArea {
+        anchors.fill: parent
+        z: 1
+        onClicked: root.pressed = !root.pressed
+    }
 }
