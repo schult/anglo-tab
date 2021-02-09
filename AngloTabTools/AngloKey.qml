@@ -1,13 +1,13 @@
 import QtQuick 2.9
 
 Item {
-    property string name: 'X'
-    property string pushNote: 'Y0'
-    property string pullNote: 'Z0'
-    property bool pushMode: true
-    property alias color: button.color
+    id: root
 
-    property bool checked: false
+    property string name: 'X'
+    property string push: 'Y0'
+    property string pull: 'Z0'
+    property bool pullActive: false
+    property bool pressed: false
 
     implicitWidth: implicitHeight
     implicitHeight: pushText.height + pullText.height + 14
@@ -15,8 +15,8 @@ Item {
     Circle {
         id: button
 
-        readonly property color foreground: checked ? 'white' : 'black'
-        readonly property color background: checked ? 'black' : 'white'
+        readonly property color foreground: root.pressed ? 'white' : 'black'
+        readonly property color background: root.pressed ? 'black' : 'white'
 
         anchors.fill: parent
 
@@ -30,9 +30,9 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.verticalCenter
 
-            text: pushNote
-            font.bold: pushMode
-            color: pushMode ? button.foreground : 'grey'
+            text: root.push
+            font.bold: !root.pullActive
+            color: root.pullActive ? 'grey' : button.foreground
             horizontalAlignment: Text.AlignHCenter
         }
 
@@ -42,17 +42,10 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.verticalCenter
 
-            text: pullNote
-            font.bold: !pushMode
-            color: pushMode ? 'grey' : button.foreground
+            text: root.pull
+            font.bold: root.pullActive
+            color: root.pullActive ? button.foreground : 'grey'
             horizontalAlignment: Text.AlignHCenter
         }
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        z: 1
-
-        onClicked: checked = !checked
     }
 }
