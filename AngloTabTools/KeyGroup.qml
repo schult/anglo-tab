@@ -1,8 +1,6 @@
 import QtQuick 2.9
 import QtQuick.Layouts 1.3
 
-// TODO: Let others set current selection
-
 Item {
     id: root
 
@@ -23,9 +21,15 @@ Item {
     implicitWidth: content.width
     implicitHeight: content.height
 
+    function setPressedKeys(keyNames) {
+        console.log(keyNames)
+        content.setPressedKeys(keyNames)
+    }
+
     ColumnLayout {
         id: content
         spacing: vSpacing
+        signal setPressedKeys(var keyNames)
     }
 
     Component {
@@ -73,6 +77,11 @@ Item {
                         } else {
                             root.keyReleased(b.name)
                         }
+                    }
+                }(button))
+                content.setPressedKeys.connect(function(b) {
+                    return function(keyNames) {
+                        b.pressed = (keyNames.indexOf(b.name) != -1)
                     }
                 }(button))
             }

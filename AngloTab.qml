@@ -44,10 +44,18 @@ MuseScore {
 
         enabled = true
 
-        // TODO: Update button states
+        const newCursor = curScore.newCursor()
+        newCursor.rewindToTick(element.tick)
 
-        cursor = curScore.newCursor()
-        cursor.rewindToTick(element.tick)
+        if(getPullActive(newCursor)) {
+            pullBellows.checked = true
+        } else {
+            pushBellows.checked = true
+        }
+        rightHand.setPressedKeys(getKeys(newCursor, Placement.ABOVE))
+        leftHand.setPressedKeys(getKeys(newCursor, Placement.BELOW))
+
+        cursor = newCursor
     }
 
     function getKeys(cursor, placement) {
@@ -66,6 +74,7 @@ MuseScore {
     }
 
     function getPullActive(cursor) {
+        if(!cursor) return false
         const keys = getKeys(cursor, Placement.ABOVE)
         return keys.indexOf('_') != -1
     }
@@ -212,6 +221,8 @@ MuseScore {
             ColumnLayout {
                 width: parent.width
                 KeyGroup {
+                    id: leftHand
+
                     Layout.margins: 2
                     Layout.alignment: Qt.AlignHCenter
 
