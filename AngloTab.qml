@@ -50,21 +50,6 @@ MuseScore {
         cursor.rewindToTick(element.tick)
     }
 
-    function getPullActive(cursor) {
-        if(!cursor) return false
-        const elements = cursor.segment.annotations
-        for(var i = elements.length; i--;)
-        {
-            const element = elements[i]
-            if(element.type == Element.STAFF_TEXT &&
-                    element.text == '_' &&
-                    element.placement == Placement.ABOVE) {
-                return true
-            }
-        }
-        return false
-    }
-
     function getKeys(cursor, placement) {
         if(!cursor) return []
         const keys = []
@@ -73,7 +58,6 @@ MuseScore {
         {
             const element = elements[i]
             if(element.type == Element.STAFF_TEXT &&
-                    element.text != '_' &&
                     element.placement == placement) {
                 keys.push(element.text)
             }
@@ -81,14 +65,55 @@ MuseScore {
         return keys
     }
 
+    function getPullActive(cursor) {
+        const keys = getKeys(cursor, Placement.ABOVE)
+        return keys.indexOf('_') != -1
+    }
+
+    function clearKeys(cursor, placement) {
+        if(!cursor) return
+        const elements = cursor.segment.annotations
+        for(var i = elements.length; i--;)
+        {
+            const element = elements[i]
+            if(element.type == Element.STAFF_TEXT &&
+                    element.placement == placement) {
+                removeElement(element)
+            }
+        }
+    }
+
     function addKey(cursor, keyName, placement) {
         if(!cursor) return
+
+        const keyOrder = [
+            '1', '1a', '2', '2a', '3', '3a', '4', '4a', '5', '5a',
+            '6', '7', '8', '9', '10', '_'
+        ]
+
+        const aboveKeyOrder = function(a, b) {
+            return keyOrder.indexOf(a) - keyOrder.indexOf(b)
+        }
+
+        const belowKeyOrder = function(a, b) {
+            return keyOrder.indexOf(b) - keyOrder.indexOf(a)
+        }
+
+        const keys = getKeys(cursor, placement)
+        if(keys.indexOf(keyName) == -1) {
+            keys.push(keyName)
+        }
+        keys.sort((placement == Placement.ABOVE) ?
+            aboveKeyOrder : belowKeyOrder)
+
         curScore.startCmd()
-        const text = newElement(Element.STAFF_TEXT)
-        text.text = keyName
-        text.placement = placement
-        // TODO: Keep key order consistent
-        cursor.add(text)
+        clearKeys(cursor, placement)
+        for(var i = 0; i < keys.length; ++i) {
+            const text = newElement(Element.STAFF_TEXT)
+            text.text = keys[i]
+            text.placement = placement
+            cursor.add(text)
+        }
         curScore.endCmd()
     }
 
