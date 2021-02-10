@@ -2,7 +2,6 @@ import QtQuick 2.9
 import QtQuick.Layouts 1.3
 
 // TODO: Let others set current selection
-// TODO: Emit when selection changes
 
 Item {
     id: root
@@ -14,9 +13,12 @@ Item {
 
     property int columnCount: 5
     readonly property int rowCount: Math.ceil(keys.length / columnCount)
-    property double hSpacing: 10
-    property double vSpacing: hSpacing / 2
-    property double skew: 20
+    property real hSpacing: 10
+    property real vSpacing: hSpacing / 2
+    property real skew: 20
+
+    signal keyPressed(string keyName)
+    signal keyReleased(string keyName)
 
     implicitWidth: content.width
     implicitHeight: content.height
@@ -64,6 +66,15 @@ Item {
                     'pull': props.pull,
                     'pullActive': Qt.binding(function() { return root.pullActive }),
                 })
+                button.pressedChanged.connect(function(b) {
+                    return function() {
+                        if(b.pressed) {
+                            root.keyPressed(b.name)
+                        } else {
+                            root.keyReleased(b.name)
+                        }
+                    }
+                }(button))
             }
         }
     }

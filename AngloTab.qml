@@ -4,8 +4,7 @@ import QtQuick.Layouts 1.3
 import MuseScore 3.0
 import 'AngloTabTools'
 
-// TODO: Highlight buttons that match selected note
-// TODO: Make buttons actually do something
+// TODO: Put contents in ScrollView?
 
 MuseScore {
     menuPath: 'Plugins.AngloTab'
@@ -14,6 +13,8 @@ MuseScore {
 
     pluginType: 'dock'
     dockArea: 'right'
+
+    property var cursor: null
 
     onRun: selectionChanged()
 
@@ -24,13 +25,19 @@ MuseScore {
     }
 
     function selectionChanged() {
+        cursor = null
+
         if(!curScore || curScore.selection.elements.length != 1) {
             enabled = false
             return
         }
 
         var element = curScore.selection.elements[0]
-        if(element.type != Element.NOTE) {
+        while(element && element.type != Element.SEGMENT) {
+            element = element.parent
+        }
+
+        if(!element) {
             enabled = false
             return
         }
@@ -38,6 +45,53 @@ MuseScore {
         enabled = true
 
         // TODO: Update button states
+
+        cursor = curScore.newCursor()
+        cursor.rewindToTick(element.tick)
+    }
+
+    function getKeys(cursor, placement) {
+        if(!cursor) return []
+        const keys = []
+        const elements = cursor.segment.annotations
+        for(var i = elements.length; i--;)
+        {
+            const element = elements[i]
+            if(element.type == Element.STAFF_TEXT &&
+                    element.text != '_' &&
+                    element.placement == placement) {
+                keys.push(element)
+            }
+        }
+        return keys
+    }
+
+    function addKey(cursor, keyName, placement) {
+        if(!cursor) return
+        curScore.startCmd()
+        const text = newElement(Element.STAFF_TEXT)
+        text.text = keyName
+        text.placement = placement
+        // TODO: Keep key order consistent
+        cursor.add(text)
+        curScore.endCmd()
+    }
+
+    function removeKey(cursor, keyName, placement) {
+        if(!cursor) return
+        const keys = getKeys(cursor, placement)
+        curScore.startCmd()
+        for(var i = 0; i < keys.length; ++i) {
+            if(keys[i].text == keyName) {
+                removeElement(keys[i])
+            }
+        }
+        curScore.endCmd()
+    }
+
+    function setPullActive(cursor, pullActive) {
+        if(!cursor) return
+        console.log(pullActive ? 'PULL' : 'PUSH') // TODO
     }
 
     ColumnLayout {
@@ -62,6 +116,8 @@ MuseScore {
                     id: pullBellows
                     text: 'Pull'
                     exclusiveGroup: bellowsGroup
+
+                    onCheckedChanged: setPullActive(cursor, checked)
                 }
             }
         }
@@ -79,6 +135,9 @@ MuseScore {
 
                     leftHand: false
                     pullActive: pullBellows.checked
+
+                    onKeyPressed: addKey(cursor, keyName, Placement.ABOVE)
+                    onKeyReleased: removeKey(cursor, keyName, Placement.ABOVE)
 
                     KeyProperties { name: '1a'; push: 'C#5'; pull: 'D#5' }
                     KeyProperties { name: '2a'; push: 'A5';  pull: 'G5' }
@@ -110,6 +169,9 @@ MuseScore {
 
                     leftHand: true
                     pullActive: pullBellows.checked
+
+                    onKeyPressed: addKey(cursor, keyName, Placement.BELOW)
+                    onKeyReleased: removeKey(cursor, keyName, Placement.BELOW)
 
                     KeyProperties { name: '1a'; push: 'E3';  pull: 'F3' }
                     KeyProperties { name: '2a'; push: 'A3';  pull: 'A#3' }

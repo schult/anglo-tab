@@ -1,7 +1,7 @@
 import QtQuick 2.9
 
 Item {
-    readonly property double diameter: Math.min(width, height)
+    readonly property real diameter: Math.min(width, height)
     property alias color: rect.color
     property alias border: rect.border
 
