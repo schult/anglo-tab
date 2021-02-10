@@ -4,22 +4,48 @@ import QtQuick.Layouts 1.3
 import MuseScore 3.0
 import 'AngloTabTools'
 
-// TODO: React to selection changes
 // TODO: Highlight buttons that match selected note
 // TODO: Make buttons actually do something
 
 MuseScore {
-    menuPath:   'Plugins.AngloTab'
-    version:  '1.0'
+    menuPath: 'Plugins.AngloTab'
+    version: '1.0'
     description: 'This plugin provides an interface for creating tablature for 30-button anglo concertina.'
 
     pluginType: 'dock'
-    dockArea:   'right'
+    dockArea: 'right'
+
+    onRun: selectionChanged()
+
+    onScoreStateChanged: {
+        if(state.selectionChanged) {
+            selectionChanged()
+        }
+    }
+
+    function selectionChanged() {
+        if(!curScore || curScore.selection.elements.length != 1) {
+            enabled = false
+            return
+        }
+
+        var element = curScore.selection.elements[0]
+        if(element.type != Element.NOTE) {
+            enabled = false
+            return
+        }
+
+        enabled = true
+
+        // TODO: Update button states
+    }
 
     ColumnLayout {
         id: content
         anchors.fill: parent
         anchors.margins: 10
+
+        opacity: enabled ? 1.0 : 0.6
 
         GroupBox {
             Layout.fillWidth: true

@@ -15,14 +15,17 @@ Item {
     Circle {
         id: button
 
-        readonly property color foreground: root.pressed ? 'white' : 'black'
-        readonly property color background: root.pressed ? 'black' : 'white'
+        readonly property color inactiveForeground: 'gray'
+        readonly property color activeForeground: (!root.enabled ? 'gray' :
+            root.pressed ? 'white' : 'black')
+        readonly property color background: (!root.enabled ? 'white' :
+            root.pressed ? 'black' : 'white')
 
         anchors.fill: parent
 
         color: background
         border.width: 1
-        border.color: 'darkGrey'
+        border.color: '#a9a9a9'
 
         Text {
             id: pushText
@@ -31,8 +34,10 @@ Item {
             anchors.bottom: parent.verticalCenter
 
             text: root.push
-            font.bold: !root.pullActive
-            color: root.pullActive ? 'grey' : button.foreground
+            font.bold: root.enabled && !root.pullActive
+            color: (root.pullActive ?
+                button.inactiveForeground :
+                button.activeForeground)
             horizontalAlignment: Text.AlignHCenter
         }
 
@@ -43,8 +48,10 @@ Item {
             anchors.top: parent.verticalCenter
 
             text: root.pull
-            font.bold: root.pullActive
-            color: root.pullActive ? button.foreground : 'grey'
+            font.bold: root.enabled && root.pullActive
+            color: (root.pullActive ?
+                button.activeForeground :
+                button.inactiveForeground)
             horizontalAlignment: Text.AlignHCenter
         }
     }
