@@ -50,6 +50,21 @@ MuseScore {
         cursor.rewindToTick(element.tick)
     }
 
+    function getPullActive(cursor) {
+        if(!cursor) return false
+        const elements = cursor.segment.annotations
+        for(var i = elements.length; i--;)
+        {
+            const element = elements[i]
+            if(element.type == Element.STAFF_TEXT &&
+                    element.text == '_' &&
+                    element.placement == Placement.ABOVE) {
+                return true
+            }
+        }
+        return false
+    }
+
     function getKeys(cursor, placement) {
         if(!cursor) return []
         const keys = []
@@ -60,7 +75,7 @@ MuseScore {
             if(element.type == Element.STAFF_TEXT &&
                     element.text != '_' &&
                     element.placement == placement) {
-                keys.push(element)
+                keys.push(element.text)
             }
         }
         return keys
@@ -79,11 +94,15 @@ MuseScore {
 
     function removeKey(cursor, keyName, placement) {
         if(!cursor) return
-        const keys = getKeys(cursor, placement)
+        const elements = cursor.segment.annotations
         curScore.startCmd()
-        for(var i = 0; i < keys.length; ++i) {
-            if(keys[i].text == keyName) {
-                removeElement(keys[i])
+        for(var i = elements.length; i--;)
+        {
+            const element = elements[i]
+            if(element.type == Element.STAFF_TEXT &&
+                    element.text == keyName &&
+                    element.placement == placement) {
+                removeElement(element)
             }
         }
         curScore.endCmd()
@@ -91,6 +110,11 @@ MuseScore {
 
     function setPullActive(cursor, pullActive) {
         if(!cursor) return
+        if(pullActive) {
+            addKey(cursor, '_', Placement.ABOVE)
+        } else {
+            removeKey(cursor, '_', Placement.ABOVE)
+        }
         console.log(pullActive ? 'PULL' : 'PUSH') // TODO
     }
 
