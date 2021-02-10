@@ -140,7 +140,6 @@ MuseScore {
         } else {
             removeKey(cursor, '_', Placement.ABOVE)
         }
-        console.log(pullActive ? 'PULL' : 'PUSH') // TODO
     }
 
     ColumnLayout {
