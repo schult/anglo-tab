@@ -4,8 +4,6 @@ import QtQuick.Layouts 1.3
 import MuseScore 3.0
 import 'AngloTabTools'
 
-// TODO: Put contents in ScrollView?
-
 MuseScore {
     menuPath: 'Plugins.AngloTab'
     version: '1.0'
