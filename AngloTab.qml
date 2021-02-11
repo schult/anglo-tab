@@ -121,6 +121,8 @@ MuseScore {
             const text = newElement(Element.STAFF_TEXT)
             text.text = keys[i]
             text.placement = placement
+            text.align = Align.BASELINE | Align.HCENTER
+            text.offsetX = 0.7
             cursor.add(text)
         }
         curScore.endCmd()
