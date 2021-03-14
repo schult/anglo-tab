@@ -9,8 +9,6 @@ Item {
 
     property bool pullActive: false
 
-    property int columnCount: 5
-    readonly property int rowCount: Math.ceil(keys.length / columnCount)
     property real hSpacing: 10
     property real vSpacing: hSpacing / 2
     property real skew: 20
@@ -44,14 +42,25 @@ Item {
         AngloKey {}
     }
 
-    Component.onCompleted: {
-        for(var rowIndex = 0; rowIndex < root.rowCount; ++rowIndex) {
+    function clearKeys() {
+        for(var i = content.children.length; i--;) {
+            content.children[i].destroy()
+        }
+    }
+
+    function setKeys(keys) {
+        clearKeys()
+
+        const columnCount = 5
+        const rowCount = Math.ceil(keys.length / columnCount)
+
+        for(var rowIndex = 0; rowIndex < rowCount; ++rowIndex) {
             const innerMargin = (function(r) {
                 return Qt.binding(function() { return root.skew * r })
             })(rowIndex)
             const outerMargin = (function(r) {
                 return Qt.binding(function() {
-                    return root.skew * (root.rowCount - (r+1))
+                    return root.skew * (rowCount - (r+1))
                 })
             })(rowIndex)
 
@@ -59,11 +68,11 @@ Item {
             row.Layout.rightMargin = root.leftHand ? innerMargin : outerMargin
             row.Layout.leftMargin = root.leftHand ? outerMargin: innerMargin
 
-            for(var colIndex = 0; colIndex < root.columnCount; ++colIndex) {
-                const keyIndex = (root.columnCount * rowIndex) + colIndex;
-                if(keyIndex >= root.keys.length) break
+            for(var colIndex = 0; colIndex < columnCount; ++colIndex) {
+                const keyIndex = (columnCount * rowIndex) + colIndex;
+                if(keyIndex >= keys.length) break
 
-                const props = root.keys[keyIndex]
+                const props = keys[keyIndex]
                 const button = keyButton.createObject(row, {
                     'name': props.name,
                     'push': props.push,
@@ -86,5 +95,9 @@ Item {
                 }(button))
             }
         }
+    }
+
+    Component.onCompleted: {
+        setKeys(root.keys)
     }
 }
