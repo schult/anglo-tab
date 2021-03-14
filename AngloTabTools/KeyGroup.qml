@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.3
 Item {
     id: root
 
-    default property list<KeyProperties> keys
+    property list<KeyProperties> keys
     property bool leftHand: false
 
     property bool pullActive: false
@@ -42,17 +42,13 @@ Item {
         AngloKey {}
     }
 
-    function clearKeys() {
+    onKeysChanged: {
         for(var i = content.children.length; i--;) {
             content.children[i].destroy()
         }
-    }
-
-    function setKeys(keys) {
-        clearKeys()
 
         const columnCount = 5
-        const rowCount = Math.ceil(keys.length / columnCount)
+        const rowCount = Math.ceil(root.keys.length / columnCount)
 
         for(var rowIndex = 0; rowIndex < rowCount; ++rowIndex) {
             const innerMargin = (function(r) {
@@ -70,9 +66,9 @@ Item {
 
             for(var colIndex = 0; colIndex < columnCount; ++colIndex) {
                 const keyIndex = (columnCount * rowIndex) + colIndex;
-                if(keyIndex >= keys.length) break
+                if(keyIndex >= root.keys.length) break
 
-                const props = keys[keyIndex]
+                const props = root.keys[keyIndex]
                 const button = keyButton.createObject(row, {
                     'name': props.name,
                     'push': props.push,
@@ -95,9 +91,5 @@ Item {
                 }(button))
             }
         }
-    }
-
-    Component.onCompleted: {
-        setKeys(root.keys)
     }
 }
