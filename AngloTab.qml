@@ -166,13 +166,16 @@ MuseScore {
 
             ComboBox {
                 id: layoutSelection
+                currentIndex: 2
                 model: [
+                    '20-button',
+                    'Jeffries',
                     'Wheatstone',
-                    '20-button'
                 ]
                 property var layouts: [
+                    Layouts.TwentyButton,
+                    Layouts.Jeffries,
                     Layouts.Wheatstone,
-                    Layouts.TwentyButton
                 ]
                 property var current: layouts[currentIndex]
             }
