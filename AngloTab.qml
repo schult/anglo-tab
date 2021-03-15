@@ -1,6 +1,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.3
+import Qt.labs.settings 1.0
 import MuseScore 3.0
 import 'AngloTabTools'
 import 'AngloTabTools/Layouts' as Layouts
@@ -150,6 +151,21 @@ MuseScore {
         } else {
             removeKey(cursor, '_', Placement.ABOVE)
         }
+    }
+
+    Settings {
+        id: settings
+        category: 'AngloTab'
+        property string layout: 'Wheatstone'
+    }
+
+    Component.onCompleted: {
+        const idx = layoutSelection.model.indexOf(settings.layout)
+        if(idx >= 0) layoutSelection.currentIndex = idx
+    }
+
+    Component.onDestruction: {
+        settings.layout = layoutSelection.model[layoutSelection.currentIndex]
     }
 
     ScrollForm {
