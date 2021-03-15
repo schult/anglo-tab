@@ -158,6 +158,27 @@ MuseScore {
         anchors.fill: parent
 
         FormSection {
+            title: 'Options'
+
+            Label {
+                text: 'Button Layout'
+            }
+
+            ComboBox {
+                id: layoutSelection
+                model: [
+                    'Wheatstone',
+                    '20-button'
+                ]
+                property var layouts: [
+                    Layouts.Wheatstone,
+                    Layouts.TwentyButton
+                ]
+                property var current: layouts[currentIndex]
+            }
+        }
+
+        FormSection {
             title: 'Bellows Direction'
 
             ExclusiveGroup { id: bellowsGroup }
@@ -187,7 +208,7 @@ MuseScore {
                 Layout.margins: 2
                 Layout.alignment: Qt.AlignHCenter
 
-                keys: Layouts.Wheatstone.rightHand
+                keys: layoutSelection.current.rightHand
                 leftHand: false
                 pullActive: pullBellows.checked
 
@@ -205,7 +226,7 @@ MuseScore {
                 Layout.margins: 2
                 Layout.alignment: Qt.AlignHCenter
 
-                keys: Layouts.Wheatstone.leftHand
+                keys: layoutSelection.current.leftHand
                 leftHand: true
                 pullActive: pullBellows.checked
 
