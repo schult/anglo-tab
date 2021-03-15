@@ -20,14 +20,16 @@ Item {
     implicitHeight: content.height
 
     function setPressedKeys(keyNames) {
-        console.log(keyNames)
-        content.setPressedKeys(keyNames)
+        content.pressedKeys = keyNames
     }
 
     ColumnLayout {
         id: content
         spacing: vSpacing
-        signal setPressedKeys(var keyNames)
+
+        property var pressedKeys: []
+        onPressedKeysChanged: updatePressedKeys(pressedKeys)
+        signal updatePressedKeys(var keyNames)
     }
 
     Component {
@@ -74,6 +76,7 @@ Item {
                     'push': props.push,
                     'pull': props.pull,
                     'pullActive': Qt.binding(function() { return root.pullActive }),
+                    'pressed': content.pressedKeys.indexOf(props.name) != -1
                 })
                 button.pressedChanged.connect(function(b) {
                     return function() {
@@ -84,7 +87,7 @@ Item {
                         }
                     }
                 }(button))
-                content.setPressedKeys.connect(function(b) {
+                content.updatePressedKeys.connect(function(b) {
                     return function(keyNames) {
                         b.pressed = (keyNames.indexOf(b.name) != -1)
                     }
