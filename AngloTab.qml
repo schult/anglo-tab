@@ -123,6 +123,7 @@ MuseScore {
             text.placement = placement
             text.align = Align.BASELINE | Align.HCENTER
             text.offsetX = 0.7
+            text.offsetY = (placement == Placement.ABOVE) ? -2.5 : 3.5
             cursor.add(text)
         }
         curScore.endCmd()
